@@ -77,11 +77,8 @@ import cv2
 import cpevd
 
 # Define folder paths
-GT_DIR = r"Path_to_test_GT"
-PRED_DIR = r"Path_to_predicted Sample"
-
-# Target shape (width, height)
-TARGET_SIZE = (256, 256)
+GT_DIR = r"E:\BOUNet\DRIVE\Break\Test\GT"
+PRED_DIR = r"E:\CPVD\As metrics\Dataset\Retinal_256"
 
 # Supported image extensions
 IMAGE_EXTENSIONS = ('*.bmp', '*.png', '*.jpg', '*.jpeg', '*.tif', '*.tiff')
@@ -107,14 +104,17 @@ for gt_path in gt_files:
         continue
 
     try:
-        # Load the user masks
+        # Load ground truth and prediction masks
         gt_mask = cpevd.load_mask(gt_path)
         pred_mask = cpevd.load_mask(pred_path)
 
-        # Resize both masks to 256x256
-        # INTER_NEAREST is recommended for binary/label masks to preserve values
-        gt_mask = cv2.resize(gt_mask, TARGET_SIZE, interpolation=cv2.INTER_NEAREST)
-        pred_mask = cv2.resize(pred_mask, TARGET_SIZE, interpolation=cv2.INTER_NEAREST)
+        # Get original GT shape: gt_mask.shape gives (height, width)
+        orig_h, orig_w = gt_mask.shape[:2]
+        target_size = (orig_w, orig_h)  # cv2.resize expects (width, height)
+
+        # Resize prediction mask to match the original ground truth shape
+        if pred_mask.shape[:2] != (orig_h, orig_w):
+            pred_mask = cv2.resize(pred_mask, target_size, interpolation=cv2.INTER_NEAREST)
 
         # Calculate metrics and details
         results = cpevd.compute_all_metrics(gt_mask, pred_mask)
@@ -140,9 +140,9 @@ if valid_pairs_count > 0:
     avg = {key: val / valid_pairs_count for key, val in metrics_sum.items()}
 
     print("\n" + "="*50)
-    print(f"AVERAGE PERFORMANCE EVALUATION ({valid_pairs_count} Images")
+    print(f"AVERAGE PERFORMANCE EVALUATION ({valid_pairs_count} Images)")
     print("="*50)
-    print(f" CPEVD Similarity Index : {avg['cpevd']:.6f}")
+    print(f" CPEVD Similarity Index : {avg['cpevd']:.4f}")
     print(f" Dice Coefficient       : {avg['dice']:.4f}")
     print(f" Jaccard Index (IoU)    : {avg['jaccard']:.4f}")
     print(f" Accuracy               : {avg['accuracy']:.4f}")
@@ -151,6 +151,8 @@ if valid_pairs_count > 0:
     print(f" Specificity            : {avg['specificity']:.4f}")
     print(f" Hausdorff Distance     : {avg['hausdorff']:.2f} pixels")
     print("="*50)
+else:
+    print("No matching image pairs found to process.")
 else:
     print("No matching image pairs found to process.")
 ````
