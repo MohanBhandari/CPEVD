@@ -77,8 +77,8 @@ import cv2
 import cpevd
 
 # Define folder paths
-GT_DIR = r"E:\BOUNet\DRIVE\Break\Test\GT"
-PRED_DIR = r"E:\CPVD\As metrics\Dataset\Retinal_256"
+GT_DIR = r"Path to Test GT"
+PRED_DIR = r"Path to Predicted "
 
 # Supported image extensions
 IMAGE_EXTENSIONS = ('*.bmp', '*.png', '*.jpg', '*.jpeg', '*.tif', '*.tiff')
