@@ -153,8 +153,6 @@ if valid_pairs_count > 0:
     print("="*50)
 else:
     print("No matching image pairs found to process.")
-else:
-    print("No matching image pairs found to process.")
 ````
 
 
